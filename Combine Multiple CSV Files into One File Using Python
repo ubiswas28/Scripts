@@ -1,0 +1,70 @@
+#Prepare your CSV files
+Make sure all the CSV files you want to combine are in the same folder. Ensure they all have the same structure (i.e., the same columns in the same order).
+#Create a Python script
+Open a text editor and save a new file with a .py extension (for example, combine_csv.py). In this file, paste the following Python code:
+import pandas as pd
+import os
+
+​# replace with your folder's path
+folder_path = r'C:\path\to\your\folder'
+all_files = os.listdir(folder_path)
+
+# Filter out non-CSV files
+csv_files = [f for f in all_files if f.endswith('.csv')]
+
+​# Create a list to hold the dataframes
+df_list = []
+
+​for csv in csv_files:
+    file_path = os.path.join(folder_path, csv)
+    try:
+        # Try reading the file using default UTF-8 encoding
+        df = pd.read_csv(file_path)
+        df_list.append(df)
+    except UnicodeDecodeError:
+        try:
+            # If UTF-8 fails, try reading the file using UTF-16 encoding with tab separator
+            df = pd.read_csv(file_path, sep='\t', encoding='utf-16')
+            df_list.append(df)
+        except Exception as e:
+            print(f"Could not read file {csv} because of error: {e}")
+    except Exception as e:
+        print(f"Could not read file {csv} because of error: {e}")
+
+​# Concatenate all data into one DataFrame
+big_df = pd.concat(df_list, ignore_index=True)
+
+​# Save the final result to a new CSV file
+big_df.to_csv(os.path.join(folder_path, 'combined_file.csv'), index=False)
+
+Remember to replace 'C:\path\to\your\folder' with the actual path of your folder.
+Step 5: Navigate to your Python script using the Command Prompt
+Open Command Prompt. To navigate to the folder where you saved your Python script, use the cd command, which stands for "change directory".
+For example, if your script is in the directory
+"C:\Users\YourName\Documents", you would type cd C:\Users\YourName\Documents and press Enter.
+If the folder name contains a space, you need to enclose the path in double quotes, like so: cd "C:\Users\YourName\My Documents".
+Step 6: Run the script
+After navigating to the correct folder, run your script with the command python combine_csv.py.
+After the script has finished running, you should find a new CSV file named combined_file.csv in your folder. This file contains the combined data from all your CSV files.
+
+
+Troubleshooting Common Issues:
+PermissionError: [Errno 13] Permission denied: This error typically occurs if the script does not have permission to read the file or write to the directory. Make sure your user account has the necessary permissions for the folder where your CSV files are located and where you're trying to save the combined file.
+FileNotFoundError: [Errno 2] No such file or directory: This error occurs if the specified file or directory does not exist. Check the path you have provided in folder_path and ensure it is correct.
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte: This error typically occurs if the file is not in the expected 'utf-16' encoding. If you know the file is in a different encoding, you can change the encoding='utf-16' part of the code to match the actual encoding.
+Combining Excel (.XLSX , .XLS, .XLB) Files:
+If you want to combine Excel files instead of CSV files, you would need to install the openpyxl package (for .xlsx files) or xlrd package (for .xls files) with pip install openpyxl xlrd.
+Then, replace pd.read_csv() with pd.read_excel() in the code, and change the file extension in the if condition from .csv to .xls, .xlsx, .xlsb, etc., based on the type of Excel files you have.
+Note: All Excel files should be of the same type (.xls, .xlsx, .xlsb, etc.). If you have different types, you would need to run separate blocks of code for each type.
+Here's what the adjusted code snippet would look like for .xlsx files:
+# Filter out non-Excel files
+xlsx_files = [f for f in all_files if f.endswith('.xlsx')]
+
+​for xlsx in xlsx_files:
+    try:
+        df = pd.read_excel(os.path.join(folder_path, xlsx))
+        df_list.append(df)
+    except Exception as e:
+        print(f"Could not read file {xlsx} because of error: {e}")
+
+https://www.raredogmarketing.com/resources/combining-multiple-csv-files-into-one-file-using-python-step-by-step-guide
